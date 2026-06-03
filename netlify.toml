@@ -1,0 +1,12 @@
+[build]
+  publish = "."
+  command = ""
+
+# Serve .html with the correct content-type (Netlify does this by default;
+# explicit headers here also add light security hardening).
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+    Cache-Control = "public, max-age=300"
