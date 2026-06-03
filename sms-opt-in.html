@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>VolleyHub — SMS Opt-In Disclosure</title>
+  <style>
+    :root {
+      --ink: #1a2230;
+      --muted: #5a6679;
+      --line: #e3e8ef;
+      --accent: #1f6feb;
+      --bg: #f6f8fb;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 28px 20px 64px; }
+    header.masthead {
+      text-align: center;
+      padding: 24px 0 8px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 24px;
+    }
+    header.masthead .brand {
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+    header.masthead .sub {
+      color: var(--muted);
+      font-size: 0.98rem;
+      margin: 6px 0 0;
+    }
+    h1 { font-size: 1.35rem; margin: 28px 0 10px; letter-spacing: -0.01em; }
+    h2 { font-size: 1.12rem; margin: 28px 0 8px; }
+    p { margin: 0 0 14px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin: 18px 0;
+    }
+    ol.steps { margin: 8px 0 4px; padding-left: 22px; }
+    ol.steps li { margin: 0 0 10px; }
+    .quote {
+      border-left: 4px solid var(--accent);
+      background: #eef4ff;
+      padding: 14px 16px;
+      border-radius: 0 10px 10px 0;
+      font-size: 1.02rem;
+      color: var(--ink);
+      margin: 14px 0;
+    }
+    ul.msgtypes { margin: 6px 0 4px; padding-left: 22px; }
+    ul.msgtypes li { margin: 0 0 8px; }
+    .shot {
+      display: block;
+      max-width: 320px;
+      width: 100%;
+      margin: 18px auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 6px 24px rgba(26, 34, 48, 0.10);
+    }
+    .shotcap {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin: -6px 0 18px;
+    }
+    .disclaimer {
+      font-size: 0.92rem;
+      color: var(--muted);
+      background: #fbfcfe;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 16px 0;
+    }
+    a { color: var(--accent); }
+    .links { margin: 18px 0; }
+    .links a { display: inline-block; margin-right: 18px; font-weight: 600; }
+    footer {
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    code.kw {
+      background: #eef1f6;
+      border-radius: 5px;
+      padding: 1px 6px;
+      font-weight: 700;
+      font-size: 0.95em;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="masthead">
+      <p class="brand">VolleyHub</p>
+      <p class="sub">SMS Opt-In Disclosure &amp; Call-to-Action Proof</p>
+    </header>
+
+    <h1>About VolleyHub</h1>
+    <p>
+      VolleyHub is a local volleyball tournament management app for Lancaster County,
+      Pennsylvania. It lets tournament organizers publish upcoming tournaments and lets
+      players register their teams. The app coordinates account access, organizer
+      approvals, and registration logistics; it is not a payment processor — any money
+      moves directly between organizers and players outside the app.
+    </p>
+
+    <h1>How SMS Opt-In Works</h1>
+    <p>
+      All SMS messaging is strictly transactional and is initiated by the end user. A user
+      opts in to receive SMS during sign-in by completing the steps below on the VolleyHub
+      sign-in screen:
+    </p>
+    <div class="card">
+      <ol class="steps">
+        <li>The user opens the VolleyHub app and is taken to the <strong>Sign in</strong> screen.</li>
+        <li>The user enters <strong>their own mobile phone number</strong> in the phone number field.</li>
+        <li>
+          Directly beneath the <strong>“Send code”</strong> button, the user reads the SMS
+          consent disclosure (shown verbatim below) explaining that tapping the button
+          consents to receiving a one-time passcode by SMS.
+        </li>
+        <li>
+          The user taps <strong>“Send code,”</strong> which constitutes their opt-in, and
+          VolleyHub sends a one-time passcode (OTP) by SMS to the number they entered.
+        </li>
+        <li>The user enters the passcode in the app to verify their phone and sign in.</li>
+      </ol>
+    </div>
+
+    <img class="shot" src="login-optin.png"
+         alt="VolleyHub sign-in screen showing the phone number field, the Send code button, and the SMS consent disclosure text directly below it." />
+    <p class="shotcap">VolleyHub sign-in screen — phone field, “Send code” button, and the consent disclosure shown at the opt-in point.</p>
+
+    <h2>Exact consent language shown in the app</h2>
+    <p>The following text is displayed in-app immediately below the “Send code” button:</p>
+    <div class="quote">
+      “By tapping Send code, you agree to receive a one-time passcode SMS from VolleyHub
+      at the number provided. Msg &amp; data rates may apply. Reply STOP to opt out, HELP
+      for help.”
+    </div>
+
+    <h1>Types of Messages We Send</h1>
+    <ul class="msgtypes">
+      <li><strong>One-time login passcodes</strong> — a numeric code to verify the user's phone number and sign in.</li>
+      <li><strong>Organizer approval notifications</strong> — a one-time notice when a user's request to become a tournament organizer is approved.</li>
+      <li><strong>Tournament registration status updates</strong> — notices when a team's tournament registration status changes.</li>
+    </ul>
+
+    <h1>Message Frequency</h1>
+    <p>
+      Messages are transactional only — there is no marketing or promotional messaging.
+      Message frequency varies by account activity (for example, each sign-in attempt
+      sends one passcode). Most users receive only a small number of messages.
+    </p>
+
+    <div class="disclaimer">
+      Message &amp; data rates may apply. Reply <code class="kw">STOP</code> to opt out at
+      any time. Reply <code class="kw">HELP</code> for help.
+    </div>
+    <div class="disclaimer">
+      Carriers are not liable for delayed or undelivered messages.
+    </div>
+
+    <div class="links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Service</a>
+    </div>
+
+    <footer>
+      <p>
+        Contact: <a href="mailto:sammy@lappsonlinedynamics.com">sammy@lappsonlinedynamics.com</a><br />
+        Lapp's Online Dynamics LLC
+      </p>
+    </footer>
+  </div>
+</body>
+</html>
