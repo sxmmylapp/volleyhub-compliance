@@ -136,7 +136,8 @@
         <li>
           Directly beneath the <strong>“Send code”</strong> button, the user reads the SMS
           consent disclosure (shown verbatim below) explaining that tapping the button
-          consents to receiving a one-time passcode by SMS.
+          consents to receiving a one-time passcode by SMS and, if they request organizer
+          access, an SMS when that request is approved.
         </li>
         <li>
           The user taps <strong>“Send code,”</strong> which constitutes their opt-in, and
@@ -151,18 +152,23 @@
     <p class="shotcap">VolleyHub sign-in screen — phone field, “Send code” button, and the consent disclosure shown at the opt-in point.</p>
 
     <h2>Exact consent language shown in the app</h2>
-    <p>The following text is displayed in-app immediately below the “Send code” button:</p>
+    <p>
+      The following text is displayed in-app immediately below the “Send code” button. It is the
+      same text shown in the screenshot above, captured from the shipped build:
+    </p>
     <div class="quote">
       “By tapping Send code, you agree to receive a one-time passcode SMS from VolleyHub
-      at the number provided. Msg &amp; data rates may apply. Reply STOP to opt out, HELP
-      for help.”
+      at the number provided, and, if you request organizer access, an SMS when that request
+      is approved. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help.”
     </div>
     <p>
-      That consent language covers the one-time passcode. The organizer approval notification
-      listed below is never sent to anyone who has not asked for it: requesting organizer access
+      That consent language names <strong>both</strong> classes of message the number may receive:
+      the one-time passcode, and the organizer approval notification. The user agrees to both at
+      the same opt-in point, before either message is sent. The approval notification is in
+      addition never sent to anyone who has not asked for it: requesting organizer access
       is a separate, user-initiated action taken inside the app, the notification is sent only in
       response to that request, and it goes to the same number the user already verified at
-      sign-in. It is disclosed in our <a href="privacy.html">Privacy Policy</a>, and like every
+      sign-in. It is also disclosed in our <a href="privacy.html">Privacy Policy</a>, and like every
       other VolleyHub message it carries <code class="kw">STOP</code> instructions. Reply
       <code class="kw">STOP</code> to opt out of all VolleyHub messages.
     </p>
