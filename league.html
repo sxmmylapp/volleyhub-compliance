@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src https://focgxfhdtyejebsoxpei.supabase.co http://127.0.0.1:*; img-src 'self'; base-uri 'none'; form-action 'none'" />
+  <!-- LEAGUE-16: the public league page. It reads one league, its standings and its bracket with the
+       public anon key; it never reads a roster, a phone number or a payment name. -->
+  <meta name="volleyhub-api" content="https://focgxfhdtyejebsoxpei.supabase.co" />
+  <meta name="volleyhub-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvY2d4ZmhkdHllamVic294cGVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4OTk5NTYsImV4cCI6MjA5MjQ3NTk1Nn0.vYe9XT4AagT3wZosMKWuspcF4OXni8faDkvSmRvBIi4" /> <!-- gitleaks:allow: the Supabase anon key is public by design; every VolleyHub app binary carries it -->
+  <title>VolleyHub — League standings</title>
+  <style>
+    :root { --ink:#1a2230; --muted:#5a6679; --line:#e3e8ef; --accent:#1f6feb; --bg:#f6f8fb; --card:#fff; }
+    * { box-sizing:border-box; }
+    html { -webkit-text-size-adjust:100%; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg); line-height:1.6; }
+    .wrap { max-width:760px; margin:0 auto; padding:28px 20px 64px; }
+    header.masthead { text-align:center; padding:24px 0 8px; border-bottom:1px solid var(--line); margin-bottom:24px; }
+    header.masthead .brand { font-size:1.55rem; font-weight:800; letter-spacing:-0.02em; margin:0; }
+    header.masthead .sub { color:var(--muted); font-size:0.98rem; margin:6px 0 0; }
+    h1 { font-size:1.3rem; margin:26px 0 6px; letter-spacing:-0.01em; overflow-wrap:anywhere; }
+    h2 { font-size:1.1rem; margin:28px 0 10px; }
+    h3 { font-size:1rem; margin:18px 0 8px; color:var(--muted); }
+    p { margin:0 0 14px; }
+    a { color:var(--accent); }
+    .muted { color:var(--muted); }
+    .notice { font-weight:600; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:4px 0; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+    th, td { padding:10px 14px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap; }
+    th:nth-child(2), td:nth-child(2) { text-align:left; white-space:normal; overflow-wrap:anywhere; width:100%; }
+    th:first-child, td:first-child { text-align:left; }
+    thead th { color:var(--muted); font-weight:600; font-size:0.9rem; }
+    tbody th { font-weight:400; }
+    tbody tr:last-child th, tbody tr:last-child td { border-bottom:0; }
+    ul.matches { list-style:none; margin:0; padding:0; }
+    ul.matches li { padding:10px 14px; border-bottom:1px solid var(--line); overflow-wrap:anywhere; }
+    ul.matches li:last-child { border-bottom:0; }
+    .score { display:block; color:var(--muted); font-variant-numeric:tabular-nums; }
+    button { font:inherit; color:#fff; background:var(--accent); border:0; border-radius:8px; padding:10px 18px; min-height:44px; cursor:pointer; }
+    button:focus-visible { outline:3px solid var(--ink); outline-offset:2px; }
+    footer { margin-top:36px; padding-top:18px; border-top:1px solid var(--line); color:var(--muted); font-size:0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="masthead">
+      <p class="brand">VolleyHub</p>
+      <p class="sub">League standings</p>
+    </header>
+
+    <main id="content" aria-live="polite">
+      <p class="muted">Loading the league…</p>
+    </main>
+
+    <footer>
+      <p>Lapp's Online Dynamics LLC · <a href="privacy.html">Privacy</a></p>
+    </footer>
+  </div>
+  <script>
+  (function () {
+    'use strict';
+
+    var COPY = {
+      loading: 'Loading the league…',
+      noLeague: "This link doesn't point to a league.",
+      notFound: "We couldn't find this league. It may not be published yet.",
+      failed: "Couldn't load the league. Check your connection and try again.",
+      retry: 'Try again',
+      cancelled: 'This league was cancelled.',
+      standingsEmpty: 'Standings appear after the first score.'
+    };
+    var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    var SURFACE = { indoor: 'Indoor', outdoor: 'Outdoor' };
+    var GENDER = { coed: 'Co-ed', mens: "Men's", womens: "Women's" };
+    var main = document.getElementById('content');
+
+    function meta(name) {
+      var m = document.querySelector('meta[name="' + name + '"]');
+      return m ? m.getAttribute('content') : '';
+    }
+    var API = meta('volleyhub-api').replace(/\/+$/, '');
+    var KEY = meta('volleyhub-anon-key');
+
+    // Every database string reaches the page through textContent, never as markup.
+    function el(tag, text, className) {
+      var node = document.createElement(tag);
+      if (text !== undefined && text !== null) node.textContent = String(text);
+      if (className) node.className = className;
+      return node;
+    }
+    function show(nodes) {
+      main.replaceChildren.apply(main, nodes);
+    }
+    function message(text, retry) {
+      var nodes = [el('p', text)];
+      if (retry) {
+        var button = el('button', COPY.retry);
+        button.type = 'button';
+        button.addEventListener('click', retry);
+        nodes.push(button);
+      }
+      show(nodes);
+    }
+
+    function request(method, path, body) {
+      return fetch(API + path, {
+        method: method,
+        headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' },
+        body: body === undefined ? undefined : JSON.stringify(body),
+        credentials: 'omit',
+        cache: 'no-store'
+      }).then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      });
+    }
+
+    function signed(n) { return n > 0 ? '+' + n : String(n); }
+
+    function standingsSection(rows) {
+      var section = el('section');
+      section.id = 'standings';
+      section.appendChild(el('h2', 'Standings'));
+      var played = rows.some(function (r) { return r.matches_played > 0; });
+      if (!played) {
+        section.appendChild(el('p', COPY.standingsEmpty, 'muted'));
+        return section;
+      }
+      var showPoints = rows.some(function (r) { return r.league_points !== null && r.league_points !== undefined; });
+      var table = el('table');
+      var head = el('thead');
+      var headRow = el('tr');
+      ['Rank', 'Team', 'Sets', '+/-'].concat(showPoints ? ['Points'] : []).forEach(function (label) {
+        var th = el('th', label);
+        th.scope = 'col';
+        headRow.appendChild(th);
+      });
+      head.appendChild(headRow);
+      table.appendChild(head);
+      var body = el('tbody');
+      rows.forEach(function (r) {
+        var tr = el('tr');
+        var rank = el('th', r.tied ? 'T-' + r.rank : String(r.rank));
+        rank.scope = 'row';
+        tr.appendChild(rank);
+        tr.appendChild(el('td', r.team_name));
+        tr.appendChild(el('td', r.sets_won + '-' + r.sets_lost));
+        tr.appendChild(el('td', signed(r.point_diff)));
+        if (showPoints) tr.appendChild(el('td', r.league_points === null ? 0 : r.league_points));
+        body.appendChild(tr);
+      });
+      table.appendChild(body);
+      var wrap = el('div', null, 'card table-wrap');
+      wrap.appendChild(table);
+      section.appendChild(wrap);
+      return section;
+    }
+
+    function bracketRank(b) { return b === 'winners' ? 1 : b === 'losers' ? 2 : 3; }
+    function seedOf(source) {
+      var m = /^seed:(\d+)$/.exec(source || '');
+      return m ? Number(m[1]) : null;
+    }
+
+    // "(1) Team" for a decided side, "TBD" for one still waiting; the winner's name is bold.
+    function side(name, seed, teamId, winnerId) {
+      var span = el('span');
+      if (!name) {
+        span.textContent = 'TBD';
+        return span;
+      }
+      if (seed) span.appendChild(document.createTextNode('(' + seed + ') '));
+      span.appendChild(el(teamId && teamId === winnerId ? 'strong' : 'span', name));
+      return span;
+    }
+
+    function matchItem(n) {
+      var li = el('li');
+      if (n.kind === 'walkover') {
+        var seed = seedOf(n.home_source) || seedOf(n.away_source);
+        li.appendChild(side(n.winner_team_name, seed, null, null));
+        li.appendChild(document.createTextNode(' · Bye'));
+        return li;
+      }
+      li.appendChild(side(n.home_team_name, n.home_seed, n.home_team_id, n.winner_team_id));
+      li.appendChild(document.createTextNode('  vs  '));
+      li.appendChild(side(n.away_team_name, n.away_seed, n.away_team_id, n.winner_team_id));
+      var home = n.home_points || [];
+      var away = n.away_points || [];
+      if (n.is_reset && n.status === 'cancelled') {
+        li.appendChild(el('span', 'Not needed', 'score'));
+      } else if (home.length && away.length) {
+        var sets = home.map(function (h, i) { return h + '-' + away[i]; }).join(', ');
+        li.appendChild(el('span', sets, 'score'));
+      } else if (n.status === 'cancelled') {
+        li.appendChild(el('span', 'Cancelled', 'score'));
+      } else if (n.status === 'postponed') {
+        li.appendChild(el('span', 'Postponed', 'score'));
+      }
+      return li;
+    }
+
+    function playoffsSection(nodes) {
+      var live = nodes.filter(function (n) { return n.kind !== 'dead'; });
+      if (!live.length) return null;
+      var double = live.some(function (n) { return n.bracket === 'losers'; });
+      live.sort(function (a, b) {
+        return (bracketRank(a.bracket) - bracketRank(b.bracket)) || (a.round - b.round) || (a.position - b.position);
+      });
+      var section = el('section');
+      section.id = 'playoffs';
+      section.appendChild(el('h2', 'Playoffs'));
+      var title = null;
+      var list = null;
+      live.forEach(function (n) {
+        var t = n.bracket === 'winners' ? (double ? 'Winners bracket · Round ' + n.round : 'Round ' + n.round)
+          : n.bracket === 'losers' ? 'Losers bracket · Round ' + n.round
+          : (n.is_reset ? 'Final (if needed)' : 'Final');
+        if (t !== title) {
+          title = t;
+          section.appendChild(el('h3', t));
+          list = el('ul', null, 'matches');
+          var card = el('div', null, 'card');
+          card.appendChild(list);
+          section.appendChild(card);
+        }
+        list.appendChild(matchItem(n));
+      });
+      return section;
+    }
+
+    function render(league, standings, bracket) {
+      document.title = 'VolleyHub — ' + league.name;
+      var nodes = [el('h1', league.name)];
+      var facts = [GENDER[league.gender_division], league.team_size, SURFACE[league.surface]]
+        .filter(Boolean).join(' · ');
+      nodes.push(el('p', facts, 'muted'));
+      if (league.location_text) nodes.push(el('p', league.location_text, 'muted'));
+      if (league.status === 'canceled') nodes.push(el('p', COPY.cancelled, 'notice'));
+      nodes.push(standingsSection(standings));
+      var playoffs = playoffsSection(bracket);
+      if (playoffs) nodes.push(playoffs);
+      show(nodes);
+    }
+
+    function load(id) {
+      message(COPY.loading);
+      main.firstChild.className = 'muted';
+      var retry = function () { load(id); };
+      request('GET', '/rest/v1/league?id=eq.' + encodeURIComponent(id) +
+        '&select=id,name,status,team_size,surface,gender_division,location_text')
+        .then(function (rows) {
+          if (!Array.isArray(rows) || rows.length !== 1) {
+            message(COPY.notFound);
+            return;
+          }
+          var league = rows[0];
+          return Promise.all([
+            request('POST', '/rest/v1/rpc/league_standings', { p_league_id: id }),
+            request('POST', '/rest/v1/rpc/league_bracket', { p_league_id: id })
+          ]).then(function (both) {
+            render(league, both[0] || [], both[1] || []);
+          });
+        })
+        .catch(function () { message(COPY.failed, retry); });
+    }
+
+    var id = new URLSearchParams(window.location.search).get('id') || '';
+    if (!UUID.test(id)) {
+      message(COPY.noLeague);
+    } else {
+      load(id);
+    }
+  })();
+  </script>
+</body>
+</html>

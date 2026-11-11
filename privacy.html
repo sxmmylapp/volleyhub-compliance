@@ -31,7 +31,7 @@
       <p class="sub">Privacy Policy</p>
     </header>
 
-    <p class="effective">Effective date: 2026-10-15 · Lapp's Online Dynamics LLC</p>
+    <p class="effective">Effective date: 2026-11-11 · Lapp's Online Dynamics LLC</p>
 
     <p>
       This Privacy Policy describes how VolleyHub, operated by Lapp's Online Dynamics LLC,
@@ -43,9 +43,13 @@
     <ul>
       <li><strong>Phone number</strong> — used to authenticate your account via a one-time passcode (OTP) sent by SMS.</li>
       <li><strong>Display name</strong> — shown to organizers and other participants within the app.</li>
-      <li><strong>Phone numbers a team captain enters for league players</strong> — when a captain adds a player to a league team roster, the captain types that player's phone number or picks it from the iPhone contact picker. The contact picker shares only the chosen phone number with VolleyHub; we do not read the contact's name or the rest of your address book. We store only the phone number: no name is stored for a player who is not a VolleyHub user. We also keep a service-only record of the number and the team, used solely to limit repeat notifications to the same number.</li>
+      <li><strong>Phone numbers a team captain enters for league players</strong> — when a captain adds a player to a league team roster, the captain types that player's phone number or picks it from the phone's contact picker. The contact picker shares only the chosen phone number with VolleyHub; we do not read the contact's name or the rest of your address book. On a league team roster we store only the phone number: no name is stored there for a player who is not a VolleyHub user. We also keep a service-only record of the number and the team, used solely to limit repeat notifications to the same number.</li>
+      <li><strong>Organizer's Cash App name ($cashtag)</strong> — if you organize tournaments or leagues, the Cash App name you enter is shown publicly on your events so players can pay you directly. VolleyHub does not process those payments. It stays on the events you organized after your account is deleted (see our <a href="delete-account.html">account deletion page</a>).</li>
+      <li><strong>Contact email for an organizer access request (optional)</strong> — if you ask for organizer access, you may add an email address to the request. It is stored with your request and sent to us in the email that tells us about the request. It is used only to reply to you about that request and is never used for marketing. When you delete your account, the copy stored with your request is deleted. The copies in the emails we already received are not part of your account and are not deleted by that.</li>
       <li><strong>Team and tournament registration data</strong> — the tournaments you create or register for and your registration status.</li>
       <li><strong>Content you create in the app</strong> — user-generated content such as tournament and team names, descriptions and notes you write, and reports you submit about other users' content.</li>
+      <li><strong>Crash reports and diagnostic data</strong> — when the app or our servers hit an error, we collect crash and diagnostic data: the error details, the app screen you were on and recent app log lines, and your device model and operating system version. Sentry collects this for us. When you delete a league or a roster player, the report of that delete carries your account id (an opaque number, not your phone number or name), so that delete&rsquo;s diagnostics are linked to your account. Phone numbers and names are still removed before a report is sent.</li>
+      <li><strong>Push notification token</strong> — if you allow notifications on a device, we store that device's push notification token so we can send it VolleyHub notifications.</li>
     </ul>
 
     <h1>How We Use Your Information</h1>
@@ -70,11 +74,17 @@
     <p>
       We do not sell your personal information, and we never share your information with third
       parties for marketing or promotional purposes. Information is shared only with
-      subcontractors and service providers strictly necessary to operate the app (for example,
-      Twilio for SMS delivery and Supabase for secure data storage), and only as needed to
-      provide the service; these providers are contractually prohibited from using your
-      information for their own purposes.
+      subcontractors and service providers strictly necessary to operate the app, and only as
+      needed to provide the service; these providers are contractually prohibited from using your
+      information for their own purposes. They are:
     </p>
+    <ul>
+      <li><strong>Supabase</strong> — stores the app's data and runs sign-in.</li>
+      <li><strong>Twilio</strong> — delivers the one-time sign-in code texts, so it receives your phone number and the code.</li>
+      <li><strong>Sentry</strong> — receives the crash and diagnostic data described above, with phone numbers and names removed. A report of a league or roster-player delete also carries your account id (an opaque number, not your phone number or name).</li>
+      <li><strong>Resend</strong> — delivers the email that tells us about a request for organizer access, so it receives the requester's display name, the request text, their user id, their phone number and the contact email they gave, if any. It also delivers the email that tells us about a content report, which holds the report id, what was reported, the reason and the user id of the person who reported it.</li>
+      <li><strong>Apple Push Notification service</strong> and <strong>Google Firebase Cloud Messaging</strong> — deliver push notifications, so they receive the device's push notification token and the notification text.</li>
+    </ul>
 
     <h1>Data Retention and Deletion</h1>
     <p>
@@ -84,15 +94,23 @@
       <strong>Delete account</strong>, then confirm. Deletion is permanent and can't be undone.
       If you can no longer sign in and cannot reach that screen, you may instead contact us at
       <a href="mailto:sammy@lappsonlinedynamics.com">sammy@lappsonlinedynamics.com</a> as a
-      secondary route and we will delete your personal information for you.
+      secondary route and we will delete your personal information for you. Our
+      <a href="delete-account.html">account deletion page</a> explains how to request deletion
+      without the app, and what is deleted and what is kept.
     </p>
     <p>
-      A phone number a captain entered for a league player is deleted from the roster when the
-      captain removes that player, and when a player who has joined the team deletes their own
-      account. A number for a player who has not joined (an Invited or declined entry) stays on the
-      team's roster record, and the service-only repeat-notification record of the number and team
-      stays with the team record, until the team record is deleted or we delete them for you.
-      Deleting your account does not reach those two. If your number was entered by a captain and
+      A phone number a captain entered for a league player is taken off the team's roster when the
+      captain removes that player; a copy is kept for 30 days so a mistaken removal can be undone,
+      then deleted automatically. When a player who has joined the team deletes their own account,
+      the number the captain entered for them is deleted from the team's roster right away. A draft
+      league its organizer deletes is likewise kept for 30 days so it can be restored, then deleted
+      automatically. Each time a captain adds a number, the service also keeps a service-only
+      repeat-notification record of that number and team, so the same player is not sent the same
+      &ldquo;added you&rdquo; notification again and again; whether or not the player joined, that
+      record is kept for 30 days after the last notification for that number and team, then deleted
+      automatically. A number for a player who has not joined (an Invited or declined entry) stays
+      on the team's roster record until the team record is deleted or we delete it for you.
+      Deleting your account does not reach that roster entry. If your number was entered by a captain and
       you want it removed, contact
       <a href="mailto:sammy@lappsonlinedynamics.com">sammy@lappsonlinedynamics.com</a> and we will
       delete it.
